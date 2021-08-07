@@ -1,18 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import * as mariadb from 'mariadb';
+
+import { Database } from './interfaces/database.interface';
+import { DATABASE_CONFIG } from './constants/database.constant';
 
 @Injectable()
 export class DatabaseService {
-  pool: mariadb.Pool;
+  private readonly pool: mariadb.Pool;
 
-  constructor() {
+  constructor(@Inject(DATABASE_CONFIG) private config: Database) {
     this.pool = mariadb.createPool({
-      host: 'localhost',
-      user: 'root',
-      password: 'admin',
-      database: 'test',
-      multipleStatements: true,
-      dateStrings: true,
+      host: config.host,
+      user: config.user,
+      password: config.password,
+      database: config.database,
+      multipleStatements: config.multipleStatements,
+      dateStrings: config.dateStrings,
     });
   }
 

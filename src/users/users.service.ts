@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { User } from './interfaces/user.interface';
 import { DatabaseService } from '../database/database.service';
+import { User } from './interfaces/user.interface';
+
 @Injectable()
 export class UsersService {
   constructor(private databaseService: DatabaseService) {}
