@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
 import { User } from './interfaces/user.interface';
-
+import { DatabaseService } from '../database/database.service';
 @Injectable()
 export class UsersService {
-  getByToken(data: string): User {
+  constructor(private databaseService: DatabaseService) {}
+
+  getByToken(data: string) {
     return {
       firstName: 'Anton',
       lastName: 'Goncharik',

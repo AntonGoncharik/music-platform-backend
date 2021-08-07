@@ -28,6 +28,7 @@
     "@types/csurf": "^1.11.2",
     "cross-env": "^7.0.3",
     "csurf": "^1.11.0",
+    "mariadb": "^2.5.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"

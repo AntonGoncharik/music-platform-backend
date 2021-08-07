@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Put, Body } from '@nestjs/common';
 
 import { UsersService } from './users.service';
-import { User } from './interfaces/user.interface';
 import { CreateUserDto, UpdateUserDto } from './dto';
 
 @Controller('users')
@@ -9,7 +8,7 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  find(token: string): User {
+  find(token: string) {
     const result = this.userService.getByToken(token);
 
     return result;
