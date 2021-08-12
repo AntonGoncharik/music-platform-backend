@@ -1,13 +1,13 @@
 import { Module, Global, DynamicModule } from '@nestjs/common';
 
-import { Database } from './interfaces/database.interface';
-import { DATABASE_CONFIG } from './constants/database.constant';
+import { IDatabase } from './interfaces';
+import { DATABASE_CONFIG } from './constants';
 import { DatabaseService } from './database.service';
 
 @Global()
 @Module({})
 export class DatabaseModule {
-  static forRoot(config: Database): DynamicModule {
+  static forRoot(config: IDatabase): DynamicModule {
     return {
       module: DatabaseModule,
       providers: [

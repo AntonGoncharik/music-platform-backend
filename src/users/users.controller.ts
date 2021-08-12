@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
@@ -16,21 +16,18 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    const result = this.userService.create({
-      email: 'ant.goncharik@gmail.com',
-      password: '',
-    });
+    const result = this.userService.create(createUserDto);
 
     return result;
   }
 
-  @Put()
-  update(@Body() updateUserDto: UpdateUserDto) {
-    const result = this.userService.update({
-      email: 'ant.goncharik@gmail.com',
-      password: '',
-    });
+  // @Patch()
+  // update(@Body() updateUserDto: UpdateUserDto) {
+  //   const result = this.userService.update({
+  //     email: 'ant.goncharik@gmail.com',
+  //     password: '',
+  //   });
 
-    return result;
-  }
+  //   return result;
+  // }
 }
