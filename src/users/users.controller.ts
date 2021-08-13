@@ -9,16 +9,12 @@ export class UsersController {
 
   @Get()
   find(token: string) {
-    const result = this.userService.getByToken(token);
-
-    return result;
+    return this.userService.getUserByToken(token);
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    const result = this.userService.create(createUserDto);
-
-    return result;
+  create(@Body() userDto: CreateUserDto) {
+    return this.userService.createUser(userDto);
   }
 
   // @Patch()

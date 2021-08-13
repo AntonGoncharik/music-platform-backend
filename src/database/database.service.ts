@@ -22,7 +22,7 @@ export class DatabaseService {
   async query(queryString: string, params: string[] = []): Promise<any> {
     try {
       const res = await this.pool.query(queryString, [...params]);
-
+      delete res.meta;
       return res;
     } catch (error) {
       throw error;

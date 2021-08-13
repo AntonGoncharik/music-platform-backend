@@ -9,7 +9,7 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 export class UsersService {
   constructor(private databaseService: DatabaseService) {}
 
-  getByToken(data: string) {
+  getUserByToken(data: string) {
     return {
       firstName: 'Anton',
       lastName: 'Goncharik',
@@ -19,28 +19,38 @@ export class UsersService {
     };
   }
 
-  async create(data: CreateUserDto): Promise<IUser> {
-    try {
-      const userModel = new UserModel(data);
+  async createUser(userDto: CreateUserDto): Promise<number> {
+    const userModel = new UserModel(userDto);
 
-      const result = await this.databaseService.query(
-        `INSERT INTO users (email, password)
-          VALUES (?, ?);`,
-        [userModel.email, userModel.password],
-      );
-      return result.insertId;
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.databaseService.query(
+      `INSERT INTO users (email, password)
+        VALUES (?, ?);`,
+      [userModel.email, userModel.password],
+    );
+
+    return result.insertId;
   }
 
-  async update(updateUserDto: UpdateUserDto): Promise<IUser> {
-    return {
-      firstName: 'Anton',
-      lastName: 'Goncharik',
-      email: 'ant.goncharik@gmail.com',
-      password: '',
-      avatarUrl: '',
-    };
+  async updateUser(updateUserDto: UpdateUserDto): Promise<any> {
+    // return {
+    //   firstName: 'Anton',
+    //   lastName: 'Goncharik',
+    //   email: 'ant.goncharik@gmail.com',
+    //   password: '',
+    //   avatarUrl: '',
+    // };
+  }
+
+  async getUserByEmail(email: string): Promise<IUser[]> {
+    const result = await this.databaseService.query(
+      `SELECT id, password 
+        FROM users
+        WHERE email = ?
+        LIMIT 1
+      `,
+      [email],
+    );
+
+    return result;
   }
 }
