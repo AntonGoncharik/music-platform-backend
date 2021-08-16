@@ -16,7 +16,7 @@ import { AuthModule } from './auth/auth.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       multipleStatements: process.env.DATABASE_MULTIPLE_STATEMENTS === 'true',
-      dateStrings: process.env.DATE_STRING === 'true',
+      dateStrings: process.env.DATABASE_DATE_STRING === 'true',
     }),
     UsersModule,
     AuthModule,
