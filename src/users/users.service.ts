@@ -4,6 +4,7 @@ import { DatabaseService } from '../database/database.service';
 import { IUser } from './interfaces';
 import { UserModel } from './models';
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { DECODING_FIELDS } from './constants';
 
 @Injectable()
 export class UsersService {
@@ -31,14 +32,19 @@ export class UsersService {
     return result.insertId;
   }
 
-  async updateUser(updateUserDto: UpdateUserDto): Promise<any> {
-    // return {
-    //   firstName: 'Anton',
-    //   lastName: 'Goncharik',
-    //   email: 'ant.goncharik@gmail.com',
-    //   password: '',
-    //   avatarUrl: '',
-    // };
+  async updateUser(userDto: UpdateUserDto): Promise<void> {
+    const userModel = new UserModel(userDto, true);
+
+    const dataForUpdate = Object.keys(userModel).map(
+      (item) => `${DECODING_FIELDS[item]} = '${userDto[item]}'`,
+    );
+
+    await this.databaseService.query(
+      `UPDATE users
+        SET ${dataForUpdate.join()}
+        WHERE id = ?;`,
+      [userDto.id],
+    );
   }
 
   async getUserByEmail(email: string): Promise<IUser[]> {

@@ -17,13 +17,8 @@ export class UsersController {
     return this.userService.createUser(userDto);
   }
 
-  // @Patch()
-  // update(@Body() updateUserDto: UpdateUserDto) {
-  //   const result = this.userService.update({
-  //     email: 'ant.goncharik@gmail.com',
-  //     password: '',
-  //   });
-
-  //   return result;
-  // }
+  @Patch()
+  update(@Body() userDto: UpdateUserDto) {
+    return this.userService.updateUser(userDto);
+  }
 }
