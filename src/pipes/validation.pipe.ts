@@ -1,8 +1,7 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-
-import { ValidationException } from '../exceptions';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
@@ -16,7 +15,7 @@ export class ValidationPipe implements PipeTransform<any> {
           ', ',
         )}`;
       });
-      throw new ValidationException(messages);
+      throw new HttpException(messages, HttpStatus.BAD_REQUEST);
     }
 
     return value;
