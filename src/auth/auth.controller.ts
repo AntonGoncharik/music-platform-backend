@@ -1,5 +1,4 @@
-import { Controller, Body, Post, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Body, Post, Get, Param, Redirect } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto';
@@ -19,10 +18,8 @@ export class AuthController {
   }
 
   @Get('/active/:link')
-  active(@Req() request: Request, @Res() response: Response) {
-    console.log(request.params.link);
-    response.redirect(`${process.env.API_URL}/auth/signin`, 301);
-    return 1;
-    // return this.authService.signup(userDto);
+  @Redirect(`${process.env.API_URL}/auth/signin`, 301)
+  active(@Param() params) {
+    this.authService.active(params.link);
   }
 }

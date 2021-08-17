@@ -57,6 +57,28 @@ export class AuthService {
     return { user: { id: userId }, token };
   }
 
+  async active(activationLink: string) {
+    const users = await this.userService.getUserByActivationLink(
+      activationLink,
+    );
+
+    if (!users.length) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+
+    if (users[0].active) {
+      throw new HttpException(
+        'User has been activated',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.userService.updateUser({
+      id: users[0].id,
+      active: 1,
+    });
+  }
+
   private generateToken(userId: number, userDto: CreateUserDto) {
     const payload = { email: userDto.email, id: userId };
 

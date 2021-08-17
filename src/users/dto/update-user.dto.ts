@@ -1,8 +1,8 @@
-import { IsString } from 'class-validator';
+import { IsInt } from 'class-validator';
 
 export class UpdateUserDto {
-  @IsString({ message: 'Should be string' })
-  id: string;
+  @IsInt({ message: 'Should be a number' })
+  id: number;
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
