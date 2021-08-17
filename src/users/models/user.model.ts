@@ -6,7 +6,7 @@ const objDef = {
   email: { type: 'string', required: true },
   password: { type: 'string', required: true },
   active: { type: 'number', required: false },
-  activeLink: { type: 'string', required: false },
+  activationLink: { type: 'string', required: false },
 };
 
 export class UserModel extends Model {
@@ -15,7 +15,7 @@ export class UserModel extends Model {
   email: string;
   password: string;
   active?: number;
-  activeLink?: string;
+  activationLink?: string;
 
   constructor(obj, ignoreRequired = false) {
     super(obj, objDef, 'User', ignoreRequired);

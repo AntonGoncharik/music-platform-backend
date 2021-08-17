@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { IUser } from './interfaces';
 import { UserModel } from './models';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { UpdateUserDto } from './dto';
 import { DECODING_FIELDS } from './constants';
 
 @Injectable()
@@ -20,13 +20,13 @@ export class UsersService {
     };
   }
 
-  async createUser(userDto: CreateUserDto): Promise<number> {
-    const userModel = new UserModel(userDto);
+  async createUser(user: IUser): Promise<number> {
+    const userModel = new UserModel(user);
 
     const result = await this.databaseService.query(
-      `INSERT INTO users (email, password)
-        VALUES (?, ?);`,
-      [userModel.email, userModel.password],
+      `INSERT INTO users (email, password, activationLink)
+        VALUES (?, ?, ?);`,
+      [userModel.email, userModel.password, userModel.activationLink],
     );
 
     return result.insertId;

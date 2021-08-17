@@ -4,11 +4,13 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
+      isGlobal: true,
     }),
     DatabaseModule.forRoot({
       host: process.env.DATABASE_HOST,
@@ -20,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    MailModule,
   ],
 })
 export class AppModule {}

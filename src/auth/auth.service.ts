@@ -6,15 +6,20 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from '../users/dto';
 import { UsersService } from '../users/users.service';
+import { MailService } from '../mail/mail.service';
+import { getTemplateRegistartionEmail } from './templates';
+import { MUSIC_PLATFORM_REGISTRATION } from './constants';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async signin(userDto: CreateUserDto) {
@@ -34,12 +39,20 @@ export class AuthService {
       );
     }
 
+    const activationLink = uuidv4();
     const hashPassword = await bcrypt.hash(userDto.password, 5);
     const userId = await this.userService.createUser({
       ...userDto,
       password: hashPassword,
+      activationLink,
     });
     const token = this.generateToken(userId, userDto);
+
+    await this.mailService.sendMail({
+      to: userDto.email,
+      subject: MUSIC_PLATFORM_REGISTRATION,
+      html: getTemplateRegistartionEmail(activationLink),
+    });
 
     return { user: { id: userId }, token };
   }

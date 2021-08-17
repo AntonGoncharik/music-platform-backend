@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +17,7 @@ import { UsersModule } from '../users/users.module';
         expiresIn: '24h',
       },
     }),
+    MailModule,
   ],
 })
 export class AuthModule {}
