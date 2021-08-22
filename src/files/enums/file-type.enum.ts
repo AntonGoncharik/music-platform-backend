@@ -1,4 +1,4 @@
 export enum FileType {
-  AUDIO = 'audio',
-  IMAGE = 'image',
+  TRACKS = 'tracks',
+  IMAGES = 'images',
 }

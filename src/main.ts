@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(helmet());
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalGuards(new JwtAuthGuard());
+  // app.useGlobalGuards(new JwtAuthGuard());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -28,4 +28,13 @@ export class DatabaseService {
       throw error;
     }
   }
+
+  async batch(queryString: string, params: string[][] = []): Promise<any> {
+    try {
+      const res = await this.pool.batch(queryString, [...params]);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
