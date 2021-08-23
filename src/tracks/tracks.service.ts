@@ -24,17 +24,20 @@ export class TracksService {
     return result;
   }
 
-  async createTrack(tracks: Express.Multer.File[]): Promise<void> {
+  async createTrack(
+    tracks: Express.Multer.File[],
+    userId: string,
+  ): Promise<void> {
     try {
       const values = tracks.map((item) => {
         const trackPaths = this.filesService.createFile(FileType.TRACKS, item);
-        const trackModel = new TrackModel(trackPaths);
-        return [trackModel.name, trackModel.path];
+        const trackModel = new TrackModel({ ...trackPaths, userId });
+        return [trackModel.userId, trackModel.name, trackModel.path];
       });
 
       await this.databaseService.batch(
-        `INSERT INTO tracks (name, path)
-        VALUES (?, ?);`,
+        `INSERT INTO tracks (user_id, name, path)
+        VALUES (?, ?, ?);`,
         values,
       );
     } catch (error) {
