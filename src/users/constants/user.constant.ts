@@ -4,4 +4,5 @@ export const DECODING_FIELDS = {
   avatarUrl: 'avatar_url',
   active: 'active',
   activationLink: 'activation_link',
+  avatar: 'avatar_path',
 };

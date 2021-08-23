@@ -46,7 +46,7 @@ export class AuthService {
       password: hashPassword,
       activationLink,
     });
-    const token = this.generateToken(userId, userDto);
+    const token = this.generateToken(`${userId}`, userDto);
 
     await this.mailService.sendMail({
       to: userDto.email,
@@ -73,13 +73,13 @@ export class AuthService {
       );
     }
 
-    await this.userService.updateUser({
+    await this.userService.updateUser(null, {
       id: users[0].id,
       active: 1,
     });
   }
 
-  private generateToken(userId: number, userDto: CreateUserDto) {
+  private generateToken(userId: string, userDto: CreateUserDto) {
     const payload = { email: userDto.email, id: userId };
 
     return {
