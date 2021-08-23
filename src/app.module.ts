@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
@@ -13,6 +15,9 @@ import { TracksModule } from './tracks/tracks.module';
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'uploads'),
     }),
     DatabaseModule.forRoot({
       host: process.env.DATABASE_HOST,
