@@ -3,7 +3,7 @@ import * as helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { ValidationPipe } from './pipes';
-import { JwtAuthGuard } from './auth/guards';
+import { JwtAuthGuard } from './api/auth/guards';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

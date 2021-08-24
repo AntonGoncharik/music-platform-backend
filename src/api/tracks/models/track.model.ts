@@ -1,4 +1,4 @@
-import { Model } from '../../common';
+import { Model } from '../../../common';
 
 const objDef = {
   name: { type: 'string', required: true },

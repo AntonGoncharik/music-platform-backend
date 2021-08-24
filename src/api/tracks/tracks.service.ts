@@ -2,12 +2,12 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as path from 'path';
 import * as fsPromises from 'fs/promises';
 
-import { FileType } from '../files/enums';
-import { DatabaseService } from '../database/database.service';
-import { FilesService } from '../files/files.service';
+import { FileType } from '../../modules/files/enums';
+import { DatabaseService } from '../../modules/database/database.service';
+import { FilesService } from '../../modules/files/files.service';
 import { ITrack } from './interfaces';
 import { TrackModel } from './models';
-import { UPLOADS } from '../files/constants';
+import { UPLOADS } from '../../modules/files/constants';
 
 @Injectable()
 export class TracksService {

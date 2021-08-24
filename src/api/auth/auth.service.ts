@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from '../users/dto';
 import { UsersService } from '../users/users.service';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../../modules/mail/mail.service';
 import { getTemplateRegistartionEmail } from './templates';
 import { MUSIC_PLATFORM_REGISTRATION } from './constants';
 

@@ -3,12 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
-import { DatabaseModule } from './database/database.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { MailModule } from './mail/mail.module';
-import { FilesModule } from './files/files.module';
-import { TracksModule } from './tracks/tracks.module';
+import { DatabaseModule } from './modules/database/database.module';
+import { UsersModule } from './api/users/users.module';
+import { AuthModule } from './api/auth/auth.module';
+import { MailModule } from './modules/mail/mail.module';
+import { FilesModule } from './modules/files/files.module';
+import { TracksModule } from './api/tracks/tracks.module';
 
 @Module({
   imports: [
