@@ -29,7 +29,7 @@ export class UsersService {
       `SELECT id, password 
         FROM users
         WHERE email = ?
-        LIMIT 1
+        LIMIT 1;
       `,
       [email],
     );
@@ -42,7 +42,7 @@ export class UsersService {
       `SELECT id, active  
         FROM users
         WHERE activation_link = ?
-        LIMIT 1
+        LIMIT 1;
       `,
       [activationLink],
     );
@@ -55,7 +55,8 @@ export class UsersService {
 
     const result = await this.databaseService.query(
       `INSERT INTO users (email, password, activation_link)
-        VALUES (?, ?, ?);`,
+        VALUES (?, ?, ?);
+      `,
       [userModel.email, userModel.password, userModel.activationLink],
     );
 
@@ -80,7 +81,8 @@ export class UsersService {
     await this.databaseService.query(
       `UPDATE users
         SET ${dataForUpdate.join()}
-        WHERE id = ?;`,
+        WHERE id = ?;
+      `,
       [`${user.id}`],
     );
   }

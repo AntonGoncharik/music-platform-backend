@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
+import { DatabaseService } from '../../database/database.service';
 import { CreateUserDto } from '../users/dto';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../../mail/mail.service';
@@ -20,19 +21,31 @@ export class AuthService {
     private userService: UsersService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private databaseService: DatabaseService,
   ) {}
 
   async signin(userDto: CreateUserDto) {
     const user = await this.validateUser(userDto);
-    const token = this.generateToken(user.id, userDto);
+    const tokens = this.generateTokens(user.id, userDto);
 
-    return { user: { id: user.id }, token };
+    await this.databaseService.query(
+      `UPDATE tokens
+        SET token = ?, refresh_token = ?
+        WHERE user_id = ?;
+      `,
+      [tokens.token, tokens.refreshToken, `${user.id}`],
+    );
+
+    return {
+      user: { id: user.id },
+      tokens,
+    };
   }
 
   async signup(userDto: CreateUserDto) {
     const users = await this.userService.getUserByEmail(userDto.email);
 
-    if (users.length) {
+    if (users[0]) {
       throw new HttpException(
         'User with this email exists',
         HttpStatus.BAD_REQUEST,
@@ -46,7 +59,14 @@ export class AuthService {
       password: hashPassword,
       activationLink,
     });
-    const token = this.generateToken(`${userId}`, userDto);
+    const tokens = this.generateTokens(`${userId}`, userDto);
+
+    await this.databaseService.query(
+      `INSERT INTO tokens (token, refresh_token, user_id)
+        VALUES (?, ?, ?);
+      `,
+      [tokens.token, tokens.refreshToken, `${userId}`],
+    );
 
     await this.mailService.sendMail({
       to: userDto.email,
@@ -54,7 +74,7 @@ export class AuthService {
       html: getTemplateRegistartionEmail(activationLink),
     });
 
-    return { user: { id: userId }, token };
+    return { user: { id: userId }, tokens };
   }
 
   async active(activationLink: string) {
@@ -79,18 +99,20 @@ export class AuthService {
     });
   }
 
-  private generateToken(userId: string, userDto: CreateUserDto) {
-    const payload = { email: userDto.email, id: userId };
+  private generateTokens(userId: string, userDto: CreateUserDto) {
+    const payloadToken = { email: userDto.email, id: userId, date: Date.now() };
+    const payloadRefreshToken = { email: userDto.email, id: userId };
 
     return {
-      token: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payloadToken),
+      refreshToken: this.jwtService.sign(payloadRefreshToken),
     };
   }
 
   private async validateUser(userDto: CreateUserDto) {
     const users = await this.userService.getUserByEmail(userDto.email);
 
-    if (users.length) {
+    if (users[0]) {
       const passwordEquals = await bcrypt.compare(
         userDto.password,
         users[0].password,

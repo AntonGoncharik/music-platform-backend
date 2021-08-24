@@ -45,7 +45,8 @@ export class TracksService {
 
       await this.databaseService.batch(
         `INSERT INTO tracks (user_id, name, path)
-        VALUES (?, ?, ?);`,
+          VALUES (?, ?, ?);
+        `,
         values,
       );
     } catch (error) {
