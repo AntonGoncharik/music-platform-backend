@@ -70,7 +70,10 @@ export class UsersService {
     );
 
     if (avatar) {
-      const avatarPath = this.filesService.createFile(FileType.IMAGES, avatar);
+      const avatarPath = await this.filesService.createFile(
+        FileType.IMAGES,
+        avatar,
+      );
       dataForUpdate.push(`${DECODING_FIELDS['avatar']} = '${avatarPath.path}'`);
     }
 
