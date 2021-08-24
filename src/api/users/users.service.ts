@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from '../../modules/database/database.service';
-import { FilesService } from '../../modules/files/files.service';
+import { DatabaseService } from '../../database/database.service';
+import { FilesService } from '../../files/files.service';
 import { IUser } from './interfaces';
 import { UserModel } from './models';
 import { DECODING_FIELDS } from './constants';
-import { FileType } from '../../modules/files/enums';
+import { FileType } from '../../files/enums';
 
 @Injectable()
 export class UsersService {
