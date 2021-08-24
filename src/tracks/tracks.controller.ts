@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   UploadedFiles,
   UseInterceptors,
@@ -10,7 +11,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { Multer } from 'multer';
 
 import { TracksService } from './tracks.service';
-import { CreateTrackDto } from './dto';
+import { CreateTrackDto, DeleteTrackDto } from './dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -23,10 +24,15 @@ export class TracksController {
 
   @Post()
   @UseInterceptors(FilesInterceptor('tracks'))
-  create(
+  createTrack(
     @UploadedFiles() tracks: Express.Multer.File[],
     @Body() trackDto: CreateTrackDto,
   ) {
     return this.tracksService.createTrack(tracks, trackDto.userId);
+  }
+
+  @Delete()
+  deleteTrack(@Body() trackDto: DeleteTrackDto) {
+    return this.tracksService.deleteTrack(trackDto.id);
   }
 }
