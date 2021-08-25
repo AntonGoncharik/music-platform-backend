@@ -100,12 +100,17 @@ export class AuthService {
   }
 
   private generateTokens(userId: string, userDto: CreateUserDto) {
-    const payloadToken = { email: userDto.email, id: userId, date: Date.now() };
-    const payloadRefreshToken = { email: userDto.email, id: userId };
+    const payload = { id: userId, email: userDto.email };
 
     return {
-      token: this.jwtService.sign(payloadToken),
-      refreshToken: this.jwtService.sign(payloadRefreshToken),
+      token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_TOKEN_SECRET_KEY,
+        expiresIn: process.env.JWT_TOKEN_EXPIRATION_TIME,
+      }),
+      refreshToken: this.jwtService.sign(payload, {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET_KEY,
+        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+      }),
     };
   }
 
