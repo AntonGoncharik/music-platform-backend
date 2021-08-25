@@ -5,10 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { JwtService } from '@nestjs/jwt';
+
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  constructor(private authService: AuthService) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -23,18 +26,26 @@ export class JwtAuthGuard implements CanActivate {
       const type = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
 
-      if (!token) {
+      if (type !== 'jwt') {
         throw new UnauthorizedException({
-          message: 'User is not logged in',
+          message: 'token type is invalid',
         });
       }
 
-      // const user = this.jwtService.verify(token);
-      // req.user = user;
+      if (!token) {
+        throw new UnauthorizedException({
+          message: 'token does not exist',
+        });
+      }
+
+      this.authService.verify(token, {
+        secret: process.env.JWT_TOKEN_SECRET_KEY,
+      });
+
       return true;
     } catch (error) {
       throw new UnauthorizedException({
-        message: 'User is not logged in',
+        message: `User is not logged in: ${error.message}`,
       });
     }
   }

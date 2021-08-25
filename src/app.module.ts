@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { APP_GUARD } from '@nestjs/core';
 
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './api/users/users.module';
@@ -9,6 +10,7 @@ import { AuthModule } from './api/auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { FilesModule } from './files/files.module';
 import { TracksModule } from './api/tracks/tracks.module';
+import { JwtAuthGuard } from './api/auth/guards';
 
 @Module({
   imports: [
@@ -32,6 +34,12 @@ import { TracksModule } from './api/tracks/tracks.module';
     MailModule,
     FilesModule,
     TracksModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}

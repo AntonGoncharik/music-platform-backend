@@ -99,6 +99,10 @@ export class AuthService {
     });
   }
 
+  verify(token: string, options: { secret: string }) {
+    return this.jwtService.verify(token, options);
+  }
+
   private generateTokens(userId: string, userDto: CreateUserDto) {
     const payload = { id: userId, email: userDto.email };
 
