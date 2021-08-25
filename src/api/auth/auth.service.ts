@@ -82,7 +82,7 @@ export class AuthService {
       activationLink,
     );
 
-    if (!users.length) {
+    if (!users[0]) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
 

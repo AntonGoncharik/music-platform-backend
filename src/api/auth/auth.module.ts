@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -11,11 +12,16 @@ import { MailModule } from '../../mail/mail.module';
   providers: [AuthService],
   imports: [
     UsersModule,
-    JwtModule.register({
-      secret: process.env.TOKEN_KEY ?? '5287601c-80b5-461b-aece-585c610a6d0d',
-      signOptions: {
-        expiresIn: '24h',
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => {
+        return {
+          secret: config.get<string>('JWT_TOKEN_SECRET_KEY'),
+          signOptions: {
+            expiresIn: config.get<string | number>('JWT_TOKEN_EXPIRATION_TIME'),
+          },
+        };
       },
+      inject: [ConfigService],
     }),
     MailModule,
   ],
