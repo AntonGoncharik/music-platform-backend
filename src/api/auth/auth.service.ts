@@ -1,8 +1,7 @@
 import {
   Injectable,
-  HttpException,
-  HttpStatus,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -25,7 +24,7 @@ export class AuthService {
   ) {}
 
   async signin(userDto: CreateUserDto) {
-    const user = await this.validateUser(userDto);
+    const user = await this.validateUserPassword(userDto);
     const tokens = this.generateTokens(user.id, userDto);
 
     await this.databaseService.query(
@@ -46,10 +45,9 @@ export class AuthService {
     const users = await this.userService.getUserByEmail(userDto.email);
 
     if (users[0]) {
-      throw new HttpException(
-        'User with this email exists',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({
+        message: 'User with this email exists',
+      });
     }
 
     const activationLink = uuidv4();
@@ -83,20 +81,65 @@ export class AuthService {
     );
 
     if (!users[0]) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException({
+        message: 'User not found',
+      });
     }
 
     if (users[0].active) {
-      throw new HttpException(
-        'User has been activated',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({
+        message: 'User has been activated',
+      });
     }
 
     await this.userService.updateUser(null, {
       id: users[0].id,
       active: 1,
     });
+  }
+
+  async refresh(refreshToken: string) {
+    const result = await this.databaseService.query(
+      `SELECT refresh_token, user_id
+        FROM tokens
+        WHERE refresh_token = ?
+        LIMIT 1;
+      `,
+      [refreshToken],
+    );
+
+    if (!result[0]) {
+      throw new BadRequestException({
+        message: 'Refresh token not found',
+      });
+    }
+
+    const user = await this.databaseService.query(
+      `SELECT email
+        FROM users
+        WHERE id = ?
+        LIMIT 1;
+      `,
+      [result[0].user_id],
+    );
+
+    const tokens = this.generateTokens(result[0].user_id, {
+      email: user[0].email,
+      password: '',
+    });
+
+    await this.databaseService.query(
+      `UPDATE tokens
+        SET token = ?, refresh_token = ?
+        WHERE user_id = ?;
+      `,
+      [tokens.token, tokens.refreshToken, result[0].user_id],
+    );
+
+    return {
+      user: { id: result[0].user_id },
+      tokens,
+    };
   }
 
   verify(token: string, options: { secret: string }) {
@@ -118,7 +161,7 @@ export class AuthService {
     };
   }
 
-  private async validateUser(userDto: CreateUserDto) {
+  private async validateUserPassword(userDto: CreateUserDto) {
     const users = await this.userService.getUserByEmail(userDto.email);
 
     if (users[0]) {

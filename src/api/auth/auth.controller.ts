@@ -2,6 +2,7 @@ import { Controller, Body, Post, Get, Param, Redirect } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto';
+import { RefreshDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,10 @@ export class AuthController {
   @Redirect(`${process.env.API_URL}/auth/signin`, 301)
   active(@Param() params) {
     this.authService.active(params.link);
+  }
+
+  @Post('/refresh')
+  refresh(@Body() refreshDto: RefreshDto) {
+    return this.authService.refresh(refreshDto.refreshToken);
   }
 }
