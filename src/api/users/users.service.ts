@@ -14,14 +14,17 @@ export class UsersService {
     private filesService: FilesService,
   ) {}
 
-  getUserByToken(token: string) {
-    return {
-      firstName: 'Anton',
-      lastName: 'Goncharik',
-      email: 'ant.goncharik@gmail.com',
-      password: '',
-      avatarUrl: '',
-    };
+  async getUserByToken(token: string): Promise<IUser[]> {
+    const result = await this.databaseService.query(
+      `SELECT user_id AS id 
+        FROM tokens
+        WHERE token = ?
+        LIMIT 1;
+      `,
+      [token],
+    );
+
+    return result;
   }
 
   async getUserByEmail(email: string): Promise<IUser[]> {

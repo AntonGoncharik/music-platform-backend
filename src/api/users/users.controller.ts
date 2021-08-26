@@ -6,6 +6,7 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Headers,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -17,7 +18,8 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  find(token: string) {
+  find(@Headers() headers: any) {
+    const token = headers.authorization.split(' ')[1];
     return this.userService.getUserByToken(token);
   }
 
