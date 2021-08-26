@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fsPromises from 'fs/promises';
 
@@ -17,14 +17,18 @@ export class TracksService {
   ) {}
 
   async getTracks(): Promise<ITrack[]> {
-    const result = await this.databaseService.query(
-      `SELECT id, name, path  
-        FROM tracks;
-      `,
-      [],
-    );
+    try {
+      const result = await this.databaseService.query(
+        `SELECT id, name, path  
+          FROM tracks;
+        `,
+        [],
+      );
 
-    return result;
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async createTrack(
@@ -50,31 +54,33 @@ export class TracksService {
         values,
       );
     } catch (error) {
-      throw new InternalServerErrorException({
-        message: error.message,
-      });
+      throw error;
     }
   }
 
   async deleteTrack(id: string): Promise<void> {
-    const result = await this.databaseService.query(
-      `SELECT path  
-        FROM tracks
-        WHERE id = ?;
-      `,
-      [id],
-    );
-
-    if (result[0]) {
-      const filePath = path.resolve(__dirname, '..', UPLOADS, result[0].path);
-
-      await fsPromises.unlink(filePath);
-      await this.databaseService.query(
-        `DELETE FROM tracks
+    try {
+      const result = await this.databaseService.query(
+        `SELECT path  
+          FROM tracks
           WHERE id = ?;
         `,
         [id],
       );
+
+      if (result[0]) {
+        const filePath = path.resolve(__dirname, '..', UPLOADS, result[0].path);
+
+        await fsPromises.unlink(filePath);
+        await this.databaseService.query(
+          `DELETE FROM tracks
+            WHERE id = ?;
+          `,
+          [id],
+        );
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

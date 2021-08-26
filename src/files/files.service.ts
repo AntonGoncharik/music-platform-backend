@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
@@ -24,9 +24,7 @@ export class FilesService {
 
       return { path: `${type}/${fileName}`, name: file.originalname };
     } catch (error) {
-      throw new InternalServerErrorException({
-        message: error.message,
-      });
+      throw error;
     }
   }
 }

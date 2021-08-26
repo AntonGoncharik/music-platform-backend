@@ -24,122 +24,138 @@ export class AuthService {
   ) {}
 
   async signin(userDto: CreateUserDto) {
-    const user = await this.validateUserPassword(userDto);
-    const tokens = this.generateTokens(user.id, userDto);
+    try {
+      const user = await this.validateUserPassword(userDto);
+      const tokens = this.generateTokens(user.id, userDto);
 
-    await this.databaseService.query(
-      `UPDATE tokens
-        SET token = ?, refresh_token = ?
-        WHERE user_id = ?;
-      `,
-      [tokens.token, tokens.refreshToken, `${user.id}`],
-    );
+      await this.databaseService.query(
+        `UPDATE tokens
+          SET token = ?, refresh_token = ?
+          WHERE user_id = ?;
+        `,
+        [tokens.token, tokens.refreshToken, `${user.id}`],
+      );
 
-    return {
-      user: { id: user.id },
-      tokens,
-    };
+      return {
+        user: { id: user.id },
+        tokens,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async signup(userDto: CreateUserDto) {
-    const users = await this.userService.getUserByEmail(userDto.email);
+    try {
+      const users = await this.userService.getUserByEmail(userDto.email);
 
-    if (users[0]) {
-      throw new BadRequestException({
-        message: 'User with this email exists',
+      if (users[0]) {
+        throw new BadRequestException({
+          message: 'User with this email exists',
+        });
+      }
+
+      const activationLink = uuidv4();
+      const hashPassword = await bcrypt.hash(userDto.password, 5);
+      const userId = await this.userService.createUser({
+        ...userDto,
+        password: hashPassword,
+        activationLink,
       });
+      const tokens = this.generateTokens(`${userId}`, userDto);
+
+      await this.databaseService.query(
+        `INSERT INTO tokens (token, refresh_token, user_id)
+          VALUES (?, ?, ?);
+        `,
+        [tokens.token, tokens.refreshToken, `${userId}`],
+      );
+
+      await this.mailService.sendMail({
+        to: userDto.email,
+        subject: MUSIC_PLATFORM_REGISTRATION,
+        html: getTemplateRegistartionEmail(activationLink),
+      });
+
+      return { user: { id: userId }, tokens };
+    } catch (error) {
+      throw error;
     }
-
-    const activationLink = uuidv4();
-    const hashPassword = await bcrypt.hash(userDto.password, 5);
-    const userId = await this.userService.createUser({
-      ...userDto,
-      password: hashPassword,
-      activationLink,
-    });
-    const tokens = this.generateTokens(`${userId}`, userDto);
-
-    await this.databaseService.query(
-      `INSERT INTO tokens (token, refresh_token, user_id)
-        VALUES (?, ?, ?);
-      `,
-      [tokens.token, tokens.refreshToken, `${userId}`],
-    );
-
-    await this.mailService.sendMail({
-      to: userDto.email,
-      subject: MUSIC_PLATFORM_REGISTRATION,
-      html: getTemplateRegistartionEmail(activationLink),
-    });
-
-    return { user: { id: userId }, tokens };
   }
 
   async active(activationLink: string) {
-    const users = await this.userService.getUserByActivationLink(
-      activationLink,
-    );
+    try {
+      const users = await this.userService.getUserByActivationLink(
+        activationLink,
+      );
 
-    if (!users[0]) {
-      throw new BadRequestException({
-        message: 'User not found',
+      if (!users[0]) {
+        throw new BadRequestException({
+          message: 'User not found',
+        });
+      }
+
+      if (users[0].active) {
+        throw new BadRequestException({
+          message: 'User has been activated',
+        });
+      }
+
+      await this.userService.updateUser(null, {
+        id: users[0].id,
+        active: 1,
       });
+    } catch (error) {
+      throw error;
     }
-
-    if (users[0].active) {
-      throw new BadRequestException({
-        message: 'User has been activated',
-      });
-    }
-
-    await this.userService.updateUser(null, {
-      id: users[0].id,
-      active: 1,
-    });
   }
 
   async refresh(refreshToken: string) {
-    const result = await this.databaseService.query(
-      `SELECT refresh_token, user_id
-        FROM tokens
-        WHERE refresh_token = ?
-        LIMIT 1;
-      `,
-      [refreshToken],
-    );
+    try {
+      const result = await this.databaseService.query(
+        `SELECT refresh_token, user_id
+          FROM tokens
+          WHERE refresh_token = ?
+          LIMIT 1;
+        `,
+        [refreshToken],
+      );
 
-    if (!result[0]) {
-      throw new BadRequestException({
-        message: 'Refresh token not found',
+      if (!result[0]) {
+        throw new BadRequestException({
+          message: 'Refresh token not found',
+        });
+      }
+
+      const user = await this.databaseService.query(
+        `SELECT email
+          FROM users
+          WHERE id = ?
+          LIMIT 1;
+        `,
+        [result[0].user_id],
+      );
+
+      const tokens = this.generateTokens(result[0].user_id, {
+        email: user[0].email,
+        password: '',
       });
+
+      await this.databaseService.query(
+        `UPDATE tokens
+          SET token = ?, refresh_token = ?
+          WHERE user_id = ?;
+        `,
+        [tokens.token, tokens.refreshToken, result[0].user_id],
+      );
+
+      return {
+        user: { id: result[0].user_id },
+        tokens,
+      };
+    } catch (error) {
+      throw error;
     }
-
-    const user = await this.databaseService.query(
-      `SELECT email
-        FROM users
-        WHERE id = ?
-        LIMIT 1;
-      `,
-      [result[0].user_id],
-    );
-
-    const tokens = this.generateTokens(result[0].user_id, {
-      email: user[0].email,
-      password: '',
-    });
-
-    await this.databaseService.query(
-      `UPDATE tokens
-        SET token = ?, refresh_token = ?
-        WHERE user_id = ?;
-      `,
-      [tokens.token, tokens.refreshToken, result[0].user_id],
-    );
-
-    return {
-      user: { id: result[0].user_id },
-      tokens,
-    };
   }
 
   verify(token: string, options: { secret: string }) {
@@ -162,21 +178,25 @@ export class AuthService {
   }
 
   private async validateUserPassword(userDto: CreateUserDto) {
-    const users = await this.userService.getUserByEmail(userDto.email);
+    try {
+      const users = await this.userService.getUserByEmail(`1${userDto.email}`);
 
-    if (users[0]) {
-      const passwordEquals = await bcrypt.compare(
-        userDto.password,
-        users[0].password,
-      );
+      if (users[0]) {
+        const passwordEquals = await bcrypt.compare(
+          userDto.password,
+          users[0].password,
+        );
 
-      if (passwordEquals) {
-        return users[0];
+        if (passwordEquals) {
+          return users[0];
+        }
       }
-    }
 
-    throw new UnauthorizedException({
-      message: 'Invalid email or password',
-    });
+      throw new UnauthorizedException({
+        message: 'Invalid email or password',
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -9,14 +9,18 @@ export class DatabaseService {
   private readonly pool: mariadb.Pool;
 
   constructor(@Inject(DATABASE_CONFIG) private config: IDatabase) {
-    this.pool = mariadb.createPool({
-      host: config.host,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      multipleStatements: config.multipleStatements,
-      dateStrings: config.dateStrings,
-    });
+    try {
+      this.pool = mariadb.createPool({
+        host: config.host,
+        user: config.user,
+        password: config.password,
+        database: config.database,
+        multipleStatements: config.multipleStatements,
+        dateStrings: config.dateStrings,
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async query(queryString: string, params: string[] = []): Promise<any> {
