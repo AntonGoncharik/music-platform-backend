@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsPromises from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const uniqid = require('uniqid');
 
 import { FileType } from './enums';
 import { IFile } from './interfaces';
@@ -13,7 +14,7 @@ export class FilesService {
   async createFile(type: FileType, file: Express.Multer.File): Promise<IFile> {
     try {
       const fileExtension = file.originalname.split('.').pop();
-      const fileName = uuidv4() + '.' + fileExtension;
+      const fileName = uniqid() + '.' + fileExtension;
       const filePath = path.resolve(__dirname, '..', UPLOADS, type);
 
       if (!fs.existsSync(filePath)) {

@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const uniqid = require('uniqid');
 
 import { DatabaseService } from '../../database/database.service';
 import { CreateUserDto } from '../users/dto';
@@ -55,7 +56,7 @@ export class AuthService {
         });
       }
 
-      const activationLink = uuidv4();
+      const activationLink = uniqid();
       const hashPassword = await bcrypt.hash(userDto.password, 5);
       const userId = await this.userService.createUser({
         ...userDto,
@@ -179,7 +180,7 @@ export class AuthService {
 
   private async validateUserPassword(userDto: CreateUserDto) {
     try {
-      const users = await this.userService.getUserByEmail(`1${userDto.email}`);
+      const users = await this.userService.getUserByEmail(`${userDto.email}`);
 
       if (users[0]) {
         const passwordEquals = await bcrypt.compare(
@@ -188,7 +189,7 @@ export class AuthService {
         );
 
         if (passwordEquals) {
-          return users[0];
+          return { id: users[0].id };
         }
       }
 

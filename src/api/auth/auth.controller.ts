@@ -63,7 +63,7 @@ export class AuthController {
   }
 
   @Get('/active/:link')
-  @Redirect(`${process.env.API_URL}/auth/signin`, 301)
+  @Redirect('http://localhost:3000/auth', 301)
   @ApiOperation({ summary: 'Activation user by link' })
   @ApiParam({
     name: 'link',
