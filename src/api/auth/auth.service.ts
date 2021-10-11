@@ -38,7 +38,13 @@ export class AuthService {
       );
 
       return {
-        user: { id: user.id },
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          avatarPath: user.avatarPath,
+        },
         tokens,
       };
     } catch (error) {
@@ -192,7 +198,13 @@ export class AuthService {
         );
 
         if (passwordEquals) {
-          return { id: users[0].id };
+          return {
+            id: users[0].id,
+            firstName: users[0].firstName,
+            lastName: users[0].lastName,
+            email: users[0].email,
+            avatarPath: users[0].avatarPath,
+          };
         }
       }
 

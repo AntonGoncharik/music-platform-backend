@@ -17,10 +17,11 @@ export class UsersService {
   async getUserByToken(token: string): Promise<IUser[]> {
     try {
       const result = await this.databaseService.query(
-        `SELECT user_id AS id 
+        `SELECT tokens.user_id AS id, users.email, users.first_name AS firstName, users.last_name AS lastName, users.avatar_path AS avatarPath
           FROM tokens
+          LEFT JOIN users on tokens.user_id = users.id
           WHERE token = ?
-          LIMIT 1;
+          LIMIT 1
         `,
         [token],
       );
@@ -34,7 +35,7 @@ export class UsersService {
   async getUserByEmail(email: string): Promise<IUser[]> {
     try {
       const result = await this.databaseService.query(
-        `SELECT id, password 
+        `SELECT id, password, first_name AS firstName, last_name AS lastName , email, avatar_path AS avatarPath
           FROM users
           WHERE email = ?
           LIMIT 1;
