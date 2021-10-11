@@ -1,4 +1,12 @@
-import { Controller, Body, Post, Get, Param, Redirect } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Post,
+  Get,
+  Param,
+  Redirect,
+  Headers,
+} from '@nestjs/common';
 import {
   ApiOperation,
   ApiResponse,
@@ -80,7 +88,7 @@ export class AuthController {
     this.authService.active(params.link);
   }
 
-  @Post('/refresh')
+  @Get('/refresh')
   @ApiOperation({ summary: 'Refresh user tokens' })
   @ApiBody({
     description: 'Refresh token from user',
@@ -99,7 +107,7 @@ export class AuthController {
       },
     },
   })
-  refresh(@Body() refreshDto: RefreshDto) {
-    return this.authService.refresh(refreshDto.refreshToken);
+  refresh(@Headers() headers) {
+    return this.authService.refresh(headers.authorization);
   }
 }

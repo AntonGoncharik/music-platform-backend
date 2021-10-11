@@ -111,8 +111,11 @@ export class AuthService {
     }
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(authorizationTokens: string) {
     try {
+      const token = authorizationTokens.split(' ')[1];
+      const refreshToken = authorizationTokens.split(' ')[2];
+
       const result = await this.databaseService.query(
         `SELECT refresh_token, user_id
           FROM tokens
