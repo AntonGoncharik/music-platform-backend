@@ -6,20 +6,22 @@ import { BadRequestException } from '@nestjs/common';
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
   async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
-    const obj = plainToClass(metadata.metatype, value);
-    const errors = await validate(obj);
+    try {
+      const obj = plainToClass(metadata.metatype, value);
+      const errors = await validate(obj);
 
-    if (errors.length) {
-      const messages = errors.map((error) => {
-        return `${error.property} - ${Object.values(error.constraints).join(
-          ', ',
-        )}`;
-      });
-      throw new BadRequestException({
-        message: messages,
-      });
-    }
+      if (errors.length) {
+        const messages = errors.map((error) => {
+          return `${error.property} - ${Object.values(error.constraints).join(
+            ', ',
+          )}`;
+        });
+        throw new BadRequestException({
+          message: messages,
+        });
+      }
 
-    return value;
+      return value;
+    } catch (error) {}
   }
 }

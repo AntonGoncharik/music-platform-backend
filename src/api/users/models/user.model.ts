@@ -1,6 +1,7 @@
 import { Model } from '../../../common';
 
 const objDef = {
+  id: { type: 'number', required: false },
   firstName: { type: 'string', required: false },
   lastName: { type: 'string', required: false },
   email: { type: 'string', required: true },
@@ -11,6 +12,7 @@ const objDef = {
 };
 
 export class UserModel extends Model {
+  id?: number;
   firstName?: string;
   lastName?: string;
   email: string;

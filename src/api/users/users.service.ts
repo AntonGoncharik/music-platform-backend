@@ -87,9 +87,9 @@ export class UsersService {
     try {
       const userModel = new UserModel(user, true);
 
-      const dataForUpdate = Object.keys(userModel).map(
-        (item) => `${DECODING_FIELDS[item]} = '${user[item]}'`,
-      );
+      const dataForUpdate = Object.keys(userModel)
+        .filter((item) => item !== 'id')
+        .map((item) => `${DECODING_FIELDS[item]} = '${user[item]}'`);
 
       if (avatar) {
         const avatarPath = await this.filesService.createFile(

@@ -8,21 +8,34 @@ import { FilesService } from '../../files/files.service';
 import { ITrack } from './interfaces';
 import { TrackModel } from './models';
 import { UPLOADS } from '../../files/constants';
+import { UsersService } from '../../api/users/users.service';
 
 @Injectable()
 export class TracksService {
   constructor(
     private filesService: FilesService,
     private databaseService: DatabaseService,
+    private usersService: UsersService,
   ) {}
 
-  async getTracks(): Promise<ITrack[]> {
+  async getTracks(token: string, userTracks: number): Promise<ITrack[]> {
     try {
+      const resultUser = await this.usersService.getUserByToken(
+        token.split(' ')[1],
+      );
+
+      let conditions = '';
+      const conditionsValues = [];
+      if (userTracks) {
+        conditions = ' WHERE user_id = ? ';
+        conditionsValues.push(resultUser[0].id);
+      }
+
       const result = await this.databaseService.query(
         `SELECT id, name, path  
-          FROM tracks;
+          FROM tracks ${conditions};
         `,
-        [],
+        conditionsValues,
       );
 
       return result;

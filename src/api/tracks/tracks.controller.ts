@@ -6,6 +6,8 @@ import {
   Body,
   UploadedFiles,
   UseInterceptors,
+  Query,
+  Headers,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Multer } from 'multer';
@@ -28,8 +30,11 @@ export class TracksController {
       example: ['1', '2'],
     },
   })
-  find() {
-    return this.tracksService.getTracks();
+  find(
+    @Headers('authorization') token: string,
+    @Query('userTracks') userTracks: number,
+  ) {
+    return this.tracksService.getTracks(token, userTracks);
   }
 
   @Post()

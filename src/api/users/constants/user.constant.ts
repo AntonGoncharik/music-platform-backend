@@ -5,4 +5,5 @@ export const DECODING_FIELDS = {
   active: 'active',
   activationLink: 'activation_link',
   avatar: 'avatar_path',
+  avatarPath: 'avatar_path',
 };
