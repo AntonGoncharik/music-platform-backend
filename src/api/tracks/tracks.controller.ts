@@ -33,8 +33,10 @@ export class TracksController {
   find(
     @Headers('authorization') token: string,
     @Query('userTracks') userTracks: number,
+    @Query('page') page: number,
+    @Query('size') size: number,
   ) {
-    return this.tracksService.getTracks(token, userTracks);
+    return this.tracksService.getTracks(token, userTracks, page, size);
   }
 
   @Post()

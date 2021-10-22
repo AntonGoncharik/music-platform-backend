@@ -18,12 +18,18 @@ export class TracksService {
     private usersService: UsersService,
   ) {}
 
-  async getTracks(token: string, userTracks: number): Promise<ITrack[]> {
+  async getTracks(
+    token: string,
+    userTracks: number,
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ITrack[]> {
     try {
       const resultUser = await this.usersService.getUserByToken(
         token.split(' ')[1],
       );
 
+      const limit = ` LIMIT ${(page - 1) * size}, ${size} `;
       let conditions = '';
       const conditionsValues = [];
       if (userTracks) {
@@ -33,7 +39,9 @@ export class TracksService {
 
       const result = await this.databaseService.query(
         `SELECT id, name, path  
-          FROM tracks ${conditions};
+          FROM tracks 
+          ${conditions}
+          ${limit};
         `,
         conditionsValues,
       );
