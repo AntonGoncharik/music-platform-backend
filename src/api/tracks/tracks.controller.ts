@@ -14,7 +14,7 @@ import { Multer } from 'multer';
 import { ApiOperation, ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 
 import { TracksService } from './tracks.service';
-import { CreateTrackDto, DeleteTrackDto } from './dto';
+import { CreateTrackDto, DeleteTrackDto, AddTrackToUserDto } from './dto';
 
 @ApiTags('tracks')
 @Controller('tracks')
@@ -69,5 +69,19 @@ export class TracksController {
   })
   deleteTrack(@Body() trackDto: DeleteTrackDto) {
     return this.tracksService.deleteTrack(trackDto.id);
+  }
+
+  @Post('add')
+  @ApiOperation({ summary: 'Add track to user' })
+  @ApiBody({
+    description: 'Track data',
+    type: AddTrackToUserDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Track has been added.',
+  })
+  addTrackToUser(@Body() trackDto: AddTrackToUserDto) {
+    return this.tracksService.addTrackToUser(trackDto.userId, trackDto.id);
   }
 }

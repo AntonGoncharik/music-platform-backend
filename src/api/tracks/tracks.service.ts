@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as path from 'path';
 import * as fsPromises from 'fs/promises';
 
@@ -100,6 +100,49 @@ export class TracksService {
           [id],
         );
       }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addTrackToUser(userId: string, id: string): Promise<void> {
+    try {
+      const resultTrack = await this.databaseService.query(
+        `SELECT id, name, path
+        FROM tracks
+        WHERE id = ?;
+      `,
+        [id],
+      );
+
+      if (!resultTrack.length) {
+        throw new BadRequestException({
+          message: `The track with id ${id} does not exist`,
+        });
+      }
+
+      const resultTrackUser = await this.databaseService.query(
+        `SELECT id, path
+        FROM tracks
+        WHERE user_id = ? AND path = ?;
+      `,
+        [userId, resultTrack[0].path],
+      );
+
+      if (resultTrackUser.length) {
+        throw new BadRequestException({
+          message: `User has this track`,
+        });
+      }
+
+      const resultNewTrack = await this.databaseService.query(
+        `INSERT INTO tracks (user_id, name, path)
+          VALUES (?, ?, ?);
+        `,
+        [userId, resultTrack[0].name, resultTrack[0].path],
+      );
+
+      return resultNewTrack;
     } catch (error) {
       throw error;
     }
