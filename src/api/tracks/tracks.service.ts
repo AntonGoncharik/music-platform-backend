@@ -22,7 +22,7 @@ export class TracksService {
     token: string,
     userTracks: number,
     page: number = 1,
-    size: number = 10,
+    size: number = 30,
   ): Promise<ITrack[]> {
     try {
       const resultUser = await this.usersService.getUserByToken(
