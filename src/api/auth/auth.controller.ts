@@ -67,8 +67,7 @@ export class AuthController {
     },
   })
   signup(@Body() userDto: CreateUserDto) {
-    return { hi: 'hello' };
-    // return this.authService.signup(userDto);
+    return this.authService.signup(userDto);
   }
 
   @Get('/active/:link')
